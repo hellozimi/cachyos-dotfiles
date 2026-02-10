@@ -1,0 +1,12 @@
+working-directory = home
+window-inherit-working-directory = false
+
+font-family = Berkeley Mono Condensed
+font-size = 10
+theme = Catppuccin Mocha
+
+adjust-cell-height = 25%
+
+window-padding-y = 8
+window-padding-x = 8
+

@@ -5,13 +5,32 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-unsetopt correct_all
-unsetopt correct
-source ~/.aliases
-source /usr/share/cachyos-zsh-config/cachyos-config.zsh
+source ~/powerlevel10k/powerlevel10k.zsh-theme
+
+
+# Path to your oh-my-zsh installation.
+export ZSH="/usr/share/oh-my-zsh"
+
+[[ -z "${plugins[*]}" ]] && plugins=(git fzf extract)
+
+source $ZSH/oh-my-zsh.sh
+
+source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+HISTFILE=$HOME/.zhistory
+SAVEHIST=1000
+HISTSIZE=999
+setopt share_history
+setopt hist_ignore_dups
+setopt hist_expire_dups_first
+setopt hist_verify
+
+source ~/.aliases
 
 # opencode
 export PATH=/home/simon/.opencode/bin:$PATH

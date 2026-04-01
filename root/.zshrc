@@ -35,6 +35,8 @@ source ~/.aliases
 # opencode
 export PATH=/home/simon/.opencode/bin:$PATH
 
+eval $(keychain --eval --quiet --nogui --timeout 1440)
+
 # fnm
 FNM_PATH="/home/simon/.local/share/fnm"
 if [ -d "$FNM_PATH" ]; then
@@ -49,3 +51,11 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/home/simon/google-cloud-sdk/path.zsh.inc' ]; then . '/home/simon/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/home/simon/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/simon/google-cloud-sdk/completion.zsh.inc'; fi

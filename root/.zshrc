@@ -34,6 +34,7 @@ source ~/.aliases
 
 # opencode
 export PATH=/home/simon/.opencode/bin:$PATH
+export EDITOR=vim
 
 eval $(keychain --eval --quiet --nogui --timeout 1440)
 

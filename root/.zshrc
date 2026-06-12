@@ -60,3 +60,5 @@ if [ -f '/home/simon/google-cloud-sdk/path.zsh.inc' ]; then . '/home/simon/googl
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/home/simon/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/simon/google-cloud-sdk/completion.zsh.inc'; fi
+
+if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi

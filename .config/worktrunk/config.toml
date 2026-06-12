@@ -1,0 +1,32 @@
+skip-commit-generation-prompt = true
+
+[switch]
+cd = false  # Don't change shell directory — tmux handles navigation
+
+[post-switch]
+tmux = """
+# Guard: skip if somehow not in tmux
+[ -z "$TMUX" ] && exit 0
+
+BRANCH_NAME="{{ branch | sanitize }}"
+
+# Look for an existing tmux window with this branch name
+WINDOW_INDEX=$(tmux list-windows -F '#{window_index}:#{window_name}' | awk -F: -v name="$BRANCH_NAME" '$2 == name {print $1}' | tail -n 1)
+
+if [ -n "$WINDOW_INDEX" ]; then
+    # Switch to existing window
+    tmux select-window -t "$WINDOW_INDEX"
+else
+    # Create a new window named after the branch, with worktree as cwd
+    tmux new-window -n "$BRANCH_NAME" -c "{{ worktree_path }}"
+fi
+"""
+
+[post-remove]
+tmux = """
+# Guard: skip if somehow not in tmux
+[ -z "$TMUX" ] && exit 0
+
+# Close the tmux window for this worktree if it still exists
+tmux kill-window -t "{{ branch | sanitize }}" 2>/dev/null || true
+"""

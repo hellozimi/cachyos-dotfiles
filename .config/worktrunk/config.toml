@@ -3,22 +3,59 @@ skip-commit-generation-prompt = true
 [switch]
 cd = false  # Don't change shell directory — tmux handles navigation
 
+[pre-switch]
+tmux-rename = """
+# Guard: skip if somehow not in tmux
+[ -z "$TMUX" ] && exit 0
+
+# Only rename when creating a new branch (base is set)
+{% if base %}
+CURRENT_SESSION=$(tmux display-message -p '#S')
+CURRENT_BRANCH=$(git branch --show-current)
+[ -z "$CURRENT_BRANCH" ] && exit 0
+
+# Build the expected session name: repo_branch with dots → underscores
+EXPECTED_NAME=$(echo "{{ repo }}_${CURRENT_BRANCH}" | tr '.' '_')
+
+# Only rename if current session name doesn't already match
+if [ "$CURRENT_SESSION" != "$EXPECTED_NAME" ]; then
+    tmux rename-session -t "$CURRENT_SESSION" "$EXPECTED_NAME" 2>/dev/null || true
+fi
+{% endif %}
+"""
+
 [post-switch]
 tmux = """
 # Guard: skip if somehow not in tmux
 [ -z "$TMUX" ] && exit 0
 
-BRANCH_NAME="{{ branch | sanitize }}"
+# Use repo_branch for session name (consistent with pre-switch rename)
+SESSION_NAME=$(echo "{{ repo }}_{{ branch }}" | tr '.' '_')
 
-# Look for an existing tmux window with this branch name
-WINDOW_INDEX=$(tmux list-windows -F '#{window_index}:#{window_name}' | awk -F: -v name="$BRANCH_NAME" '$2 == name {print $1}' | tail -n 1)
-
-if [ -n "$WINDOW_INDEX" ]; then
-    # Switch to existing window
-    tmux select-window -t "$WINDOW_INDEX"
+if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+    # Switch to existing session
+    tmux switch-client -t "$SESSION_NAME"
 else
-    # Create a new window named after the branch, with worktree as cwd
-    tmux new-window -n "$BRANCH_NAME" -c "{{ worktree_path }}"
+    # Create a new session named after the branch, with worktree as cwd
+    # -d is required because post-switch hooks run in the background without a terminal
+    tmux new-session -d -s "$SESSION_NAME" -c "{{ worktree_path }}"
+    tmux switch-client -t "$SESSION_NAME"
+fi
+"""
+
+[pre-remove]
+tmux = """
+# Guard: skip if somehow not in tmux
+[ -z "$TMUX" ] && exit 0
+
+# Use repo_branch for session name (consistent with other hooks)
+SESSION_NAME=$(echo "{{ repo }}_{{ branch }}" | tr '.' '_')
+
+# If we're currently in the session being removed, switch to main first
+CURRENT_SESSION=$(tmux display-message -p '#S')
+if [ "$CURRENT_SESSION" = "$SESSION_NAME" ]; then
+    MAIN_SESSION=$(echo "{{ repo }}_{{ default_branch }}" | tr '.' '_')
+    tmux switch-client -t "$MAIN_SESSION" 2>/dev/null || true
 fi
 """
 
@@ -27,6 +64,7 @@ tmux = """
 # Guard: skip if somehow not in tmux
 [ -z "$TMUX" ] && exit 0
 
-# Close the tmux window for this worktree if it still exists
-tmux kill-window -t "{{ branch | sanitize }}" 2>/dev/null || true
+# Kill the removed session (use repo_branch for consistent naming)
+SESSION_NAME=$(echo "{{ repo }}_{{ branch }}" | tr '.' '_')
+tmux kill-session -t "$SESSION_NAME" 2>/dev/null || true
 """

@@ -24,6 +24,9 @@ fi
 {% endif %}
 """
 
+[post-start]
+copy-env = "wt step copy-ignored"
+
 [post-switch]
 tmux = """
 # Guard: skip if somehow not in tmux

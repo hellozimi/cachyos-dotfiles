@@ -2,31 +2,31 @@
 // https://github.com/YaLTeR/niri/wiki/Configuration:-Input
 
 input {
-    keyboard {
-        xkb {
-            layout "us,se"
-	    options "grp:win_space_toggle"
-        }
-        numlock
+  keyboard {
+    xkb {
+      layout "us,se"
+      options "grp:win_space_toggle"
     }
+    numlock
+  }
 
-    touchpad {
-        tap
-	scroll-factor 0.2
-        natural-scroll
-	middle-emulation
-    }
+  touchpad {
+    tap
+    scroll-factor 0.2
+    natural-scroll
+    middle-emulation
+  }
 
-    //focus-follows-mouse
+  //focus-follows-mouse
 }
 
 clipboard {
-	//disable-primary
+  //disable-primary
 }
 
 gestures {
-	hot-corners {
+  hot-corners {
 
-		off
-	}
+    off
+  }
 }

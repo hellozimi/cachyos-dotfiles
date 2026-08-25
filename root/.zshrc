@@ -30,8 +30,6 @@ setopt hist_ignore_dups
 setopt hist_expire_dups_first
 setopt hist_verify
 
-source ~/.aliases
-
 # opencode
 export PATH=/home/simon/.opencode/bin:$PATH
 export EDITOR=vim

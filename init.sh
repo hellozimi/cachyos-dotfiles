@@ -159,6 +159,68 @@ symlink_root_files() {
     done
 }
 
+# Symlink items from system directory to /
+# Mirrors the filesystem structure: system/etc/foo -> /etc/foo
+symlink_system_files() {
+    local system_dir="$SCRIPT_DIR/system"
+    
+    if [[ ! -d "$system_dir" ]]; then
+        log_info "system directory does not exist, skipping..."
+        return 0
+    fi
+    
+    # Find all files in system/, maintaining relative paths
+    while IFS= read -r -d '' item; do
+        local rel_path="${item#$system_dir/}"
+        local target="/$rel_path"
+        
+        # Create parent directory if needed (requires sudo for system paths)
+        local parent_dir="$(dirname "$target")"
+        if [[ ! -d "$parent_dir" ]]; then
+            if [[ "$DRY_RUN" == true ]]; then
+                log_dry_run "Would create directory (sudo): $parent_dir"
+            else
+                log_info "Creating $parent_dir"
+                sudo mkdir -p "$parent_dir"
+            fi
+        fi
+        
+        # If target exists and is not a symlink to our source, back it up
+        if [[ -e "$target" && ! -L "$target" ]]; then
+            if [[ "$DRY_RUN" == true ]]; then
+                log_dry_run "Would backup (sudo): $target -> $target.backup"
+            else
+                log_warn "Backing up existing $target to $target.backup"
+                sudo mv "$target" "$target.backup"
+            fi
+        fi
+        
+        # Remove existing symlink if it points elsewhere
+        if [[ -L "$target" ]]; then
+            local current_link="$(readlink "$target")"
+            if [[ "$current_link" != "$item" ]]; then
+                if [[ "$DRY_RUN" == true ]]; then
+                    log_dry_run "Would remove existing symlink (sudo): $target -> $current_link"
+                else
+                    log_warn "Removing existing symlink $target -> $current_link"
+                    sudo rm "$target"
+                fi
+            else
+                log_success "Already linked: $target"
+                continue
+            fi
+        fi
+        
+        # Create symlink
+        if [[ "$DRY_RUN" == true ]]; then
+            log_dry_run "Would create symlink (sudo): $target -> $item"
+        else
+            sudo ln -s "$item" "$target"
+            log_success "Linked: $target -> $item"
+        fi
+    done < <(find "$system_dir" -type f -print0)
+}
+
 main() {
     if [[ "$DRY_RUN" == true ]]; then
         log_info "DRY RUN MODE - No changes will be made"
@@ -183,6 +245,11 @@ main() {
     # Link root files
     log_info "Processing root files..."
     symlink_root_files
+    echo ""
+
+    # Link system files
+    log_info "Processing system files..."
+    symlink_system_files
     echo ""
     
     if [[ "$DRY_RUN" == true ]]; then

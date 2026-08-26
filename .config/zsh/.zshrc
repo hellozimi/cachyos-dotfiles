@@ -26,15 +26,15 @@ compinit -d "$XDG_CACHE_HOME/zsh/zcompdump"
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
-# fzf
-if [[ -f /usr/share/fzf/key-bindings.zsh ]]; then
-	source /usr/share/fzf/key-bindings.zsh
-	source /usr/share/fzf/completion.zsh
-fi
-
 # Config files
 source "$ZDOTDIR/fzf.zsh"
 source "$ZDOTDIR/aliases.zsh"
 source "$ZDOTDIR/bindings.zsh"
+
+# zsh-vi-mode will overwrite keymaps after init, so set fzf bindings after
+zvm_after_init_commands+=(
+    '[ -f /usr/share/fzf/key-bindings.zsh ] && source /usr/share/fzf/key-bindings.zsh'
+    '[ -f /usr/share/fzf/completion.zsh ] && source /usr/share/fzf/completion.zsh'
+)
 source "$ZDOTDIR/plugins.zsh"
 source "$ZDOTDIR/prompt.zsh"

@@ -12,6 +12,7 @@ input {
 
   touchpad {
     tap
+    click-method "clickfinger"
     scroll-factor 0.2
     natural-scroll
     middle-emulation

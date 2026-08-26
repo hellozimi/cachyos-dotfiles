@@ -9,7 +9,6 @@ export FZF_DEFAULT_OPTS="
   --height 40%
   --layout reverse
   --border
-  --preview 'bat --style=numbers --color=always {}'
 "
 
 _fzf_file_no_hidden() {

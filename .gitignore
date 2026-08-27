@@ -1,0 +1,2 @@
+# Systemd user units - ignore enabled-state symlinks
+.config/systemd/user/*.target.wants/

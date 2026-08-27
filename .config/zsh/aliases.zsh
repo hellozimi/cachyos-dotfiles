@@ -1,5 +1,5 @@
-alias ls="eza --icons"
-alias tree="eza --tree --icons"
+alias ls="eza --icons=always"
+alias tree="eza --tree --icons=always"
 
 compdef eza=ls
 

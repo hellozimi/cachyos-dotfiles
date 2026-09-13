@@ -1,0 +1,37 @@
+onboarding = false
+
+[keys]
+prefix = "ctrl+s"
+navigate_workspace_up = ["k", "up"]
+navigate_workspace_down = ["j", "down"]
+
+[[keys.command]]
+key = "ctrl+h"
+type = "plugin_action"
+command = "herdr-nvim-nav.left"
+
+[[keys.command]]
+key = "ctrl+j"
+type = "plugin_action"
+command = "herdr-nvim-nav.down"
+
+[[keys.command]]
+key = "ctrl+k"
+type = "plugin_action"
+command = "herdr-nvim-nav.up"
+
+[[keys.command]]
+key = "ctrl+l"
+type = "plugin_action"
+command = "herdr-nvim-nav.right"
+
+[ui.toast]
+delivery = "system"
+
+[ui]
+show_agent_labels_on_pane_borders = false
+
+status_indicators = "symbols"
+[theme]
+name = "catppuccin"
+auto_switch = false

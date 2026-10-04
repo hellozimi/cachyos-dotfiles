@@ -1,2 +1,11 @@
 # Systemd user units - ignore enabled-state symlinks
 .config/systemd/user/*.target.wants/
+
+# herdr runtime state - keep only config.toml in source control
+.config/herdr/*.log
+.config/herdr/*.sock
+.config/herdr/session.json
+.config/herdr/release-notes.json
+.config/herdr/plugins.json
+.config/herdr/.plugins.lock
+.config/herdr/plugins/

@@ -4,6 +4,15 @@ onboarding = false
 prefix = "ctrl+s"
 navigate_workspace_up = ["k", "up"]
 navigate_workspace_down = ["j", "down"]
+# tmux-style splits: | = side by side (tmux -h), - = stacked (tmux -v)
+split_vertical = "prefix+|"
+split_horizontal = "prefix+minus"
+# prefix+c creates a new space; new tab moves to prefix+shift+c
+new_workspace = "prefix+c"
+new_tab = "prefix+shift+c"
+# prefix+w shows the goto overview (tmux choose-tree style); workspace picker moves to prefix+g
+goto = "prefix+w"
+workspace_picker = "prefix+g"
 
 [[keys.command]]
 key = "ctrl+h"

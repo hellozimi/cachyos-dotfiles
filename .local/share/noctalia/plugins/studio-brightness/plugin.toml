@@ -1,0 +1,19 @@
+id = "local/studio-brightness"
+name = "Display Brightness"
+version = "1.1.0"
+plugin_api = 24
+author = "local"
+description = "Control connected displays with kernel backlights or Apple USB HID."
+icon = "brightness-up"
+
+[[widget]]
+id = "brightness"
+entry = "widget.luau"
+
+[[panel]]
+id = "slider"
+entry = "panel.luau"
+width = 350
+height = 280
+placement = "attached"
+open_near_click = true

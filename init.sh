@@ -106,6 +106,85 @@ symlink_dir_contents() {
     done
 }
 
+# Create or update a single symlink, backing up real files/dirs as needed
+# $1: source item (in repo)
+# $2: target path
+create_symlink() {
+    local item="$1"
+    local target="$2"
+
+    # If target exists and is not a symlink to our source, back it up
+    if [[ -e "$target" && ! -L "$target" ]]; then
+        if [[ "$DRY_RUN" == true ]]; then
+            log_dry_run "Would backup: $target -> $target.backup"
+        else
+            log_warn "Backing up existing $target to $target.backup"
+            mv "$target" "$target.backup"
+        fi
+    fi
+
+    # Remove existing symlink if it points elsewhere
+    if [[ -L "$target" ]]; then
+        local current_link="$(readlink "$target")"
+        if [[ "$current_link" != "$item" ]]; then
+            if [[ "$DRY_RUN" == true ]]; then
+                log_dry_run "Would remove existing symlink: $target -> $current_link"
+            else
+                log_warn "Removing existing symlink $target -> $current_link"
+                rm "$target"
+            fi
+        else
+            log_success "Already linked: $target"
+            return 0
+        fi
+    fi
+
+    # Create symlink
+    if [[ "$DRY_RUN" == true ]]; then
+        log_dry_run "Would create symlink: $target -> $item"
+    else
+        ln -s "$item" "$target"
+        log_success "Linked: $target -> $item"
+    fi
+}
+
+# Recursively mirror the .local tree into $HOME/.local
+# Intermediate directories are created as real directories so unrelated
+# contents of ~/.local stay untouched; leaf directories (containing no
+# subdirectories) and files are symlinked.
+# $1: source directory (in repo)
+# $2: target directory (in $HOME)
+symlink_local_dir() {
+    local source_dir="$1"
+    local target_dir="$2"
+
+    # Create target directory if it doesn't exist
+    if [[ ! -d "$target_dir" ]]; then
+        if [[ "$DRY_RUN" == true ]]; then
+            log_dry_run "Would create directory: $target_dir"
+        else
+            log_info "Creating $target_dir"
+            mkdir -p "$target_dir"
+        fi
+    fi
+
+    local item
+    for item in "$source_dir"/* "$source_dir"/.[!.]* "$source_dir"/..?*; do
+        [[ ! -e "$item" ]] && continue
+
+        local item_name="$(basename "$item")"
+        local target="$target_dir/$item_name"
+
+        if [[ -d "$item" && ! -L "$item" ]] && find "$item" -mindepth 1 -maxdepth 1 -type d | grep -q .; then
+            # Directory with subdirectories: mirror as a real directory
+            symlink_local_dir "$item" "$target"
+        else
+            # File or leaf directory: symlink it
+            create_symlink "$item" "$target"
+        fi
+    done
+}
+
 # Symlink items from root directory to $HOME
 symlink_root_files() {
     local root_dir="$SCRIPT_DIR/root"
@@ -237,9 +316,13 @@ main() {
     symlink_dir_contents "$SCRIPT_DIR/.config" "$HOME/.config"
     echo ""
     
-    # Link .local contents  
+    # Link .local contents
     log_info "Processing .local..."
-    symlink_dir_contents "$SCRIPT_DIR/.local" "$HOME/.local"
+    if [[ -d "$SCRIPT_DIR/.local" ]]; then
+        symlink_local_dir "$SCRIPT_DIR/.local" "$HOME/.local"
+    else
+        log_info ".local directory does not exist in repo, skipping..."
+    fi
     echo ""
     
     # Link root files

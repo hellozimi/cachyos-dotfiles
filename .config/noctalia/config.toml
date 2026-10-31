@@ -1,0 +1,31 @@
+[shell]
+polkit_agent = true
+clipboard_auto_paste = "off"
+
+[shell.session]
+[[shell.session.actions]]
+action = "lock"
+
+[[shell.session.actions]]
+action = "logout"
+
+[[shell.session.actions]]
+action = "suspend"
+
+[[shell.session.actions]]
+action = "lock_and_suspend"
+
+[[shell.session.actions]]
+action = "reboot"
+
+[[shell.session.actions]]
+action = "shutdown"
+
+[shell.animation]
+enabled = false
+
+[widget.display-brightness]
+type = "local/studio-brightness:brightness"
+
+[lockscreen]
+transition = []

@@ -137,4 +137,8 @@ binds {
     CTRL+ALT+Delete                     { quit; } // Also quits Niri
     //Mod+Shift+P                         { power-off-monitors; } // Turn off screens (useful for OLED or privacy)
     Mod+O                               repeat=false { toggle-overview; }
+
+    CTRL+Space repeat=false { spawn "hex" "dictation" "toggle"; }
+    CTRL+Alt+Space repeat=false { spawn "hex" "dictation" "cancel"; }
+    Ctrl+Alt+V repeat=false { spawn "hex" "paste-last"; }
 }
